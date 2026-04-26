@@ -27,14 +27,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     padding: 1rem;
   }
 
   .wrap {
     padding: 1.5rem;
     width: 100%;
-    max-width: 400px; /* PC端保持适中，手机端自动变窄 */
+    max-width: 800px;
+    /* PC端保持适中，手机端自动变窄 */
     background: #fff;
     border-radius: 28px;
     box-shadow: var(--md-elevation-1);
@@ -148,7 +149,7 @@
       type="text"
       id="nameInput"
       placeholder="输入名字..."
-      value="Gemini" />
+      value="" />
     <button
       class="btn-primary"
       onclick="generate()">
@@ -163,9 +164,7 @@
       height="250"></canvas>
     <p
       class="name-label"
-      id="nameLabel">
-      Gemini
-    </p>
+      id="nameLabel"></p>
   </div>
 
   <div class="btn-row">
@@ -208,11 +207,15 @@
   async function drawIdenticon(text, canvas) {
     const hash = await md5(text.trim().toLowerCase() || " ")
     const ctx = canvas.getContext("2d")
-    const size = canvas.width
+    let size = canvas.width
     const grid = 5
-    const padding = Math.floor(size * 0.08)
-    const cellSize = Math.floor((size - padding * 2) / grid)
-    const offset = Math.floor((size - cellSize * grid) / 2)
+    const padding = 0
+    const cellSize = Math.floor(size / grid)
+    const offset = 0
+    canvas.width = cellSize * grid
+    canvas.height = cellSize * grid
+
+    size = canvas.width
 
     const hue = ((((hash[0] << 8) | hash[1]) % 360) + 360) % 360
     const sat = 45 + (hash[2] % 30)
@@ -241,17 +244,8 @@
         if (cells[row][mirrorCol]) {
           const x = offset + col * cellSize
           const y = offset + row * cellSize
-          const gap = 2
-          ctx.beginPath()
-          roundRect(
-            ctx,
-            x + gap,
-            y + gap,
-            cellSize - gap * 2,
-            cellSize - gap * 2,
-            3,
-          )
-          ctx.fill()
+
+          ctx.fillRect(x, y, cellSize, cellSize)
         }
       }
     }
