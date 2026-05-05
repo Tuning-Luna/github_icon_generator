@@ -1,330 +1,79 @@
-<style>
-  :root {
-    --md-surface: #fef7ff;
-    --md-on-surface: #1d1b20;
-    --md-primary: #6750a4;
-    --md-on-primary: #ffffff;
-    --md-secondary-container: #e8def8;
-    --md-on-secondary-container: #1d192b;
-    --md-outline: #79747e;
-    --md-elevation-1:
-      0 1px 3px 1px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --md-elevation-2:
-      0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  }
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Identicon Generator</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="style.css" />
+  </head>
+  <body>
+    <div class="bg-grid"></div>
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
-  }
+    <main class="wrap">
+      <header class="header">
+        <span class="badge">SHA-256</span>
+        <h1 class="title">Identicon<br /><em>Generator</em></h1>
+        <p class="sub">输入任意字符串，生成唯一像素图标</p>
+      </header>
 
-  body {
-    font-family: "Roboto", "Segoe UI", sans-serif;
-    background-color: var(--md-surface);
-    color: var(--md-on-surface);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* min-height: 100vh; */
-    padding: 1rem;
-  }
+      <section class="canvas-section">
+        <div class="canvas-wrap">
+          <canvas
+            id="cv"
+            width="250"
+            height="250"></canvas>
+        </div>
+        <p
+          class="name-label"
+          id="nameLabel">
+          —
+        </p>
+      </section>
 
-  .wrap {
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 800px;
-    /* PC端保持适中，手机端自动变窄 */
-    background: #fff;
-    border-radius: 28px;
-    box-shadow: var(--md-elevation-1);
-  }
+      <section class="controls">
+        <div class="input-row">
+          <input
+            type="text"
+            id="nameInput"
+            placeholder="repo name / username / anything…"
+            autocomplete="off"
+            spellcheck="false" />
+          <button
+            class="btn btn-generate"
+            id="btnGenerate">
+            Generate
+          </button>
+        </div>
 
-  .title {
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--md-on-surface);
-    margin-bottom: 4px;
-    text-align: center;
-  }
+        <div class="btn-row">
+          <button
+            class="btn btn-random"
+            id="btnRandom">
+            ⚄ Random
+          </button>
+          <button
+            class="btn btn-dl"
+            id="btnDownload">
+            ↓ Download
+          </button>
+        </div>
+      </section>
+    </main>
 
-  .sub {
-    font-size: 14px;
-    color: #49454f;
-    margin-bottom: 20px;
-    text-align: center;
-    line-height: 1.4;
-  }
-
-  .input-row {
-    display: flex;
-    flex-direction: column; /* 手机端输入框和生成按钮垂直排列更好按 */
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid var(--md-outline);
-    border-radius: 12px;
-    font-size: 16px; /* 至少16px防止iOS点击时自动放大页面 */
-    outline: none;
-  }
-
-  .canvas-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #f3f3f3;
-    border-radius: 24px;
-    padding: 1.5rem 1rem;
-    margin-bottom: 20px;
-  }
-
-  canvas {
-    border-radius: 16px;
-    box-shadow: var(--md-elevation-2);
-    background: #fff;
-    max-width: 100%; /* 确保图片随容器缩小 */
-    height: auto;
-  }
-
-  .name-label {
-    margin-top: 12px;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--md-primary);
-  }
-
-  .btn-row {
-    display: flex;
-    gap: 12px;
-  }
-
-  button {
-    flex: 1;
-    height: 48px; /* 增加高度更易点击 */
-    cursor: pointer;
-    border: none;
-    border-radius: 24px;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-
-  .btn-primary {
-    background-color: var(--md-primary);
-    color: var(--md-on-primary);
-  }
-
-  .btn-secondary {
-    background-color: var(--md-secondary-container);
-    color: var(--md-on-secondary-container);
-  }
-
-  .btn-dl {
-    background-color: #006a6a !important;
-    color: #ffffff !important;
-  }
-
-  /* 针对平板及PC的微调 */
-  @media (min-width: 480px) {
-    .input-row {
-      flex-direction: row;
-    }
-    .btn-primary {
-      flex: 0 0 100px;
-    }
-  }
-</style>
-
-<div class="wrap">
-  <p class="title">GitHub Icon Generator</p>
-  <p class="sub">Generate unique GitHub icons for your repositories.</p>
-
-  <div class="input-row">
-    <input
-      type="text"
-      id="nameInput"
-      placeholder="输入名字..."
-      value="" />
-    <button
-      class="btn-primary"
-      onclick="generate()">
-      Generate
-    </button>
-  </div>
-
-  <div class="canvas-wrap">
-    <canvas
-      id="cv"
-      width="250"
-      height="250"></canvas>
-    <p
-      class="name-label"
-      id="nameLabel"></p>
-  </div>
-
-  <div class="btn-row">
-    <button
-      class="btn-secondary"
-      onclick="random()">
-      Random
-    </button>
-    <button
-      class="btn-dl"
-      onclick="download()">
-      Download
-    </button>
-  </div>
-</div>
-
-<script>
-  async function md5(str) {
-    const buf = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(str),
-    )
-    return Array.from(new Uint8Array(buf))
-  }
-
-  function hslToRgb(h, s, l) {
-    s /= 100
-    l /= 100
-    const k = (n) => (n + h / 30) % 12
-    const a = s * Math.min(l, 1 - l)
-    const f = (n) =>
-      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))
-    return [
-      Math.round(f(0) * 255),
-      Math.round(f(8) * 255),
-      Math.round(f(4) * 255),
-    ]
-  }
-
-  async function drawIdenticon(text, canvas) {
-    const hash = await md5(text.trim().toLowerCase() || " ")
-    const ctx = canvas.getContext("2d")
-    let size = canvas.width
-    const grid = 5
-    const padding = 0
-    const cellSize = Math.floor(size / grid)
-    const offset = 0
-    canvas.width = cellSize * grid
-    canvas.height = cellSize * grid
-
-    size = canvas.width
-
-    const hue = ((((hash[0] << 8) | hash[1]) % 360) + 360) % 360
-    const sat = 45 + (hash[2] % 30)
-    const lig = 38 + (hash[3] % 20)
-    const [r, g, b] = hslToRgb(hue, sat, lig)
-    const fg = `rgb(${r},${g},${b})`
-    const bg = `hsl(${hue},${Math.max(sat - 30, 5)}%,${Math.min(lig + 42, 96)}%)`
-
-    ctx.clearRect(0, 0, size, size)
-    ctx.fillStyle = bg
-    roundRect(ctx, 0, 0, size, size, 12)
-    ctx.fill()
-
-    const cells = []
-    for (let i = 0; i < grid; i++) {
-      cells[i] = []
-      for (let j = 0; j < Math.ceil(grid / 2); j++) {
-        cells[i][j] = hash[4 + i * 3 + j] % 3 !== 0
-      }
-    }
-
-    ctx.fillStyle = fg
-    for (let row = 0; row < grid; row++) {
-      for (let col = 0; col < grid; col++) {
-        const mirrorCol = col < Math.ceil(grid / 2) ? col : grid - 1 - col
-        if (cells[row][mirrorCol]) {
-          const x = offset + col * cellSize
-          const y = offset + row * cellSize
-
-          ctx.fillRect(x, y, cellSize, cellSize)
-        }
-      }
-    }
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath()
-    ctx.moveTo(x + r, y)
-    ctx.lineTo(x + w - r, y)
-    ctx.arcTo(x + w, y, x + w, y + r, r)
-    ctx.lineTo(x + w, y + h - r)
-    ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
-    ctx.lineTo(x + r, y + h)
-    ctx.arcTo(x, y + h, x, y + h - r, r)
-    ctx.lineTo(x, y + r)
-    ctx.arcTo(x, y, x + r, y, r)
-    ctx.closePath()
-  }
-
-  async function generate() {
-    const name = document.getElementById("nameInput").value || "Claude"
-    document.getElementById("nameLabel").textContent = name
-    await drawIdenticon(name, document.getElementById("cv"))
-  }
-
-  const names = [
-    "Alice",
-    "Bob",
-    "Charlie",
-    "Diana",
-    "Eve",
-    "Frank",
-    "Grace",
-    "Hiro",
-    "Iris",
-    "Jack",
-    "Kai",
-    "Luna",
-    "Max",
-    "Nora",
-    "Oscar",
-    "Panda",
-    "Quinn",
-    "River",
-    "Sam",
-    "Tara",
-    "Uma",
-    "Vince",
-    "Wren",
-    "Xena",
-    "Yuki",
-    "Zara",
-    "Claude",
-    "GPT",
-    "Gemini",
-    "Grok",
-  ]
-
-  async function random() {
-    const name =
-      names[Math.floor(Math.random() * names.length)] +
-      Math.floor(Math.random() * 99)
-    document.getElementById("nameInput").value = name
-    document.getElementById("nameLabel").textContent = name
-    await drawIdenticon(name, document.getElementById("cv"))
-  }
-
-  function download() {
-    const canvas = document.getElementById("cv")
-    const name = document.getElementById("nameLabel").textContent || "identicon"
-    const link = document.createElement("a")
-    link.download = `identicon-${name}.png`
-    link.href = canvas.toDataURL("image/png")
-    link.click()
-  }
-
-  document.getElementById("nameInput").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") generate()
-  })
-
-  generate()
-</script>
+    <script src="index.js"></script>
+  </body>
+</html>
