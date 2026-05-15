@@ -213,7 +213,7 @@ input:focus {
   border: none;
   border-radius: var(--radius-btn);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   letter-spacing: 0.02em;

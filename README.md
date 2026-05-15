@@ -14,6 +14,6 @@ Enter a string to generate a GitHub-style default icon.
 
 ---
 
-Try: https://tuning-luna.github.io/github_icon_generator/
+Try: https://tuning-luna.github.io/github-avatar-generator/
 
-在线体验：https://tuning-luna.github.io/github_icon_generator/
+在线体验：https://tuning-luna.github.io/github-avatar-generator/
